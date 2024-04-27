@@ -7,10 +7,9 @@ from telegraph import Telegraph, exceptions, upload_file
 from InsaneRobot import telethn as tbot
 from InsaneRobot.events import register
 
-Anonymous = "Insane"
 TMP_DOWNLOAD_DIRECTORY = "./"
-telegraph = Telegraph()
-r = telegraph.create_account(short_name=Anonymous)
+telegraph = Telegraph(domain="graph.org")
+r = telegraph.create_account(short_name="KanhaXD")
 auth_url = r["auth_url"]
 
 
@@ -45,13 +44,12 @@ async def _(event):
                 (end - start).seconds
                 os.remove(downloaded_file_name)
                 await h.edit(
-                    "Uploaded to https://te.legra.ph{}".format(media_urls[0]),
+                    "Uploaded to https://graph.org{})".format(media_urls[0]),
                     link_preview=True,
                 )
         elif input_str == "t":
             user_object = await tbot.get_entity(r_message.sender_id)
-            title_of_page = user_object.first_name  # + " " + user_object.last_name
-            # apparently, all Users do not have last_name field
+            title_of_page = user_object.first_name
             if optional_title:
                 title_of_page = optional_title
             page_content = r_message.message
@@ -72,7 +70,7 @@ async def _(event):
             end = datetime.now()
             ms = (end - start).seconds
             await event.reply(
-                "Pasted to https://telegra.ph/{} in {} seconds.".format(
+                "Pasted to https://graph.org/{} in {} seconds.".format(
                     response["path"], ms
                 ),
                 link_preview=True,
@@ -87,10 +85,10 @@ def resize_image(image):
 
 
 __help__ = """
-I can upload files to Telegraph
- ❍ /tgm :Get Telegraph Link Of Replied Media
- ❍ /tgt :Get Telegraph Link of Replied Text
- ❍ /tgt [custom name]: Get telegraph link of replied text with custom name.
+ɪ ᴄᴀɴ ᴜᴘʟᴏᴀᴅ ғɪʟᴇs ᴛᴏ ᴛᴇʟᴇɢʀᴀᴘʜ
+ ❍ /tgm :ɢᴇᴛ ᴛᴇʟᴇɢʀᴀᴘʜ ʟɪɴᴋ ᴏғ ʀᴇᴘʟɪᴇᴅ ᴍᴇᴅɪᴀ
+ ❍ /tgt :ɢᴇᴛ ᴛᴇʟᴇɢʀᴀᴘʜ ʟɪɴᴋ ᴏғ ʀᴇᴘʟɪᴇᴅ ᴛᴇxᴛ
+ ❍ /tgt [ᴄᴜsᴛᴏᴍ ɴᴀᴍᴇ]: ɢᴇᴛ ᴛᴇʟᴇɢʀᴀᴘʜ ʟɪɴᴋ ᴏғ ʀᴇᴘʟɪᴇᴅ ᴛᴇxᴛ ᴡɪᴛʜ ᴄᴜsᴛᴏᴍ ɴᴀᴍᴇ.
 """
 
 __mod_name__ = "T-Gʀᴀᴘʜ"
