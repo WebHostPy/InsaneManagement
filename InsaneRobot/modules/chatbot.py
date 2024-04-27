@@ -132,14 +132,13 @@ def chatbot(update: Update, context: CallbackContext):
         message.reply_text(url)
 
 
-CHATBOTK_HANDLER = CommandHandler("chatbot", Insane, run_async=True)
-ADD_CHAT_HANDLER = CallbackQueryHandler(Insaneadd, pattern=r"add_chat", run_async=True)
-RM_CHAT_HANDLER = CallbackQueryHandler(Insanerm, pattern=r"rm_chat", run_async=True)
+CHATBOTK_HANDLER = CommandHandler("chatbot", Insane)
+ADD_CHAT_HANDLER = CallbackQueryHandler(Insaneadd, pattern=r"add_chat")
+RM_CHAT_HANDLER = CallbackQueryHandler(Insanerm, pattern=r"rm_chat")
 CHATBOT_HANDLER = MessageHandler(
     Filters.text
     & (~Filters.regex(r"^#[^\s]+") & ~Filters.regex(r"^!") & ~Filters.regex(r"^\/")),
     chatbot,
-    run_async=True,
 )
 
 dispatcher.add_handler(ADD_CHAT_HANDLER)
