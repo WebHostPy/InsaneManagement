@@ -2,7 +2,6 @@ import html
 import json
 import re
 from time import sleep
-
 import requests
 from telegram import (
     CallbackQuery,
@@ -19,7 +18,6 @@ from telegram.ext import (
     CommandHandler,
     Filters,
     MessageHandler,
-    run_async,
 )
 from telegram.utils.helpers import mention_html
 
@@ -27,9 +25,8 @@ import InsaneRobot.modules.sql.chatbot_sql as sql
 from InsaneRobot import BOT_ID, BOT_NAME, BOT_USERNAME, dispatcher
 from InsaneRobot.modules.helper_funcs.chat_status import user_admin, user_admin_no_reply
 from InsaneRobot.modules.log_channel import gloggable
+from MukeshAPI import api
 
-
-@run_async
 @user_admin_no_reply
 @gloggable
 def Insanerm(update: Update, context: CallbackContext) -> str:
@@ -44,8 +41,8 @@ def Insanerm(update: Update, context: CallbackContext) -> str:
             is_Insane = sql.set_Insane(user_id)
             return (
                 f"<b>{html.escape(chat.title)}:</b>\n"
-                f"AI_DISABLED\n"
-                f"<b>Admin :</b> {mention_html(user.id, html.escape(user.first_name))}\n"
+                f"ᴀɪ ᴅɪꜱᴀʙʟᴇᴅ\n"
+                f"<b>ᴀᴅᴍɪɴ :</b> {mention_html(user.id, html.escape(user.first_name))}\n"
             )
         else:
             update.effective_message.edit_text(
@@ -58,7 +55,6 @@ def Insanerm(update: Update, context: CallbackContext) -> str:
     return ""
 
 
-@run_async
 @user_admin_no_reply
 @gloggable
 def Insaneadd(update: Update, context: CallbackContext) -> str:
@@ -73,8 +69,8 @@ def Insaneadd(update: Update, context: CallbackContext) -> str:
             is_Insane = sql.rem_Insane(user_id)
             return (
                 f"<b>{html.escape(chat.title)}:</b>\n"
-                f"AI_ENABLE\n"
-                f"<b>Admin :</b> {mention_html(user.id, html.escape(user.first_name))}\n"
+                f"ᴀɪ ᴇɴᴀʙʟᴇ\n"
+                f"<b>ᴀᴅᴍɪɴ :</b> {mention_html(user.id, html.escape(user.first_name))}\n"
             )
         else:
             update.effective_message.edit_text(
@@ -87,7 +83,6 @@ def Insaneadd(update: Update, context: CallbackContext) -> str:
     return ""
 
 
-@run_async
 @user_admin
 @gloggable
 def Insane(update: Update, context: CallbackContext):
@@ -133,29 +128,18 @@ def chatbot(update: Update, context: CallbackContext):
         if not Insane_message(context, message):
             return
         bot.send_chat_action(chat_id, action="typing")
-        url = f"https://kora-api.vercel.app/chatbot/2d94e37d-937f-4d28-9196-bd5552cac68b/{BOT_NAME}/Anonymous/message={message.text}"
-        request = requests.get(url)
-        results = json.loads(request.text)
-        sleep(0.5)
-        message.reply_text(results["reply"])
+        url=api.chatgpt(message.text,mode="gf")["results"]
+        message.reply_text(url)
 
 
-__help__ = f"""
-*{BOT_NAME} has an chatbot whic provides you a seemingless chatting experience :*
-
- »  /chatbot *:* Shows chatbot control panel
-"""
-
-__mod_name__ = "Cʜᴀᴛʙᴏᴛ"
-
-
-CHATBOTK_HANDLER = CommandHandler("chatbot", Insane)
-ADD_CHAT_HANDLER = CallbackQueryHandler(Insaneadd, pattern=r"add_chat")
-RM_CHAT_HANDLER = CallbackQueryHandler(Insanerm, pattern=r"rm_chat")
+CHATBOTK_HANDLER = CommandHandler("chatbot", Insane, run_async=True)
+ADD_CHAT_HANDLER = CallbackQueryHandler(Insaneadd, pattern=r"add_chat", run_async=True)
+RM_CHAT_HANDLER = CallbackQueryHandler(Insanerm, pattern=r"rm_chat", run_async=True)
 CHATBOT_HANDLER = MessageHandler(
     Filters.text
     & (~Filters.regex(r"^#[^\s]+") & ~Filters.regex(r"^!") & ~Filters.regex(r"^\/")),
     chatbot,
+    run_async=True,
 )
 
 dispatcher.add_handler(ADD_CHAT_HANDLER)
