@@ -10,7 +10,8 @@ import requests
 from bing_image_downloader import downloader
 from bs4 import BeautifulSoup
 from PIL import Image
-from search_engine_parser import GoogleSearch
+from search_engine_parser import GoogleSearch, BingSearch, YahooSearch
+from search_engine_parser.core.exceptions import NoResultsOrTrafficError
 
 from InsaneRobot import telethn as tbot
 from InsaneRobot.events import register
@@ -25,7 +26,7 @@ async def _(event):
     if event.fwd_from:
         return
 
-    webevent = await event.reply("Searching...")
+    webevent = await event.reply("Searching the query🔎")
     match = event.pattern_match.group(1)
     page = re.findall(r"page=\d+", match)
     try:
@@ -36,7 +37,18 @@ async def _(event):
         page = 1
     search_args = (str(match), int(page))
     gsearch = GoogleSearch()
-    gresults = await gsearch.async_search(*search_args)
+    bsearch = BingSearch()
+    ysearch = YahooSearch()
+    try:
+        gresults = await gsearch.async_search(*search_args)
+    except NoResultsOrTrafficError:
+        try:
+            gresults = await bsearch.async_search(*search_args)
+        except NoResultsOrTrafficError:
+            try:
+                gresults = await ysearch.async_search(*search_args)
+            except Exception as e:
+                return await event.delete(webevent, f"**Error:**\n`{e}`", time=10)
     msg = ""
     for i in range(len(gresults["links"])):
         try:
@@ -81,7 +93,7 @@ useragent = "Mozilla/5.0 (Linux; Android 11; SM-M017F Build/PPR1.180610.011; wv)
 opener.addheaders = [("User-agent", useragent)]
 
 
-@register(pattern=r"^/reverse|^/pp|^/grs(?: |$)(\d*)")
+@register(pattern=r"^/glens|^/pp|^/grs(?: |$)(\d*)")
 async def okgoogle(img):
     """For .reverse command, Google search images and stickers."""
     if os.path.isfile("okgoogle.png"):
@@ -177,6 +189,7 @@ async def ParseSauce(googleurl):
 
 
 async def scam(results, lim):
+
     single = opener.open(results["similar_images"]).read()
     decoded = single.decode("utf-8")
 
@@ -198,6 +211,7 @@ async def scam(results, lim):
 
 @register(pattern="^/app (.*)")
 async def apk(e):
+
     try:
         app_name = e.pattern_match.group(1)
         remove_space = app_name.split(" ")
@@ -256,7 +270,7 @@ async def apk(e):
             + app_link
             + "'>View in Play Store</a>"
         )
-        app_details += "\n\n===> Insane <==="
+        app_details += "\n\n===> Fallen <==="
         await e.reply(app_details, link_preview=True, parse_mode="HTML")
     except IndexError:
         await e.reply("No result found in search. Please enter **Valid app name**")
@@ -273,3 +287,4 @@ __help__ = """
  ❍ /reverse |pp |grs: Does a reverse image search of the media which it was replied to.
 
 """
+
